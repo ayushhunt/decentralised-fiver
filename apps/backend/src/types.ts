@@ -8,3 +8,8 @@ export const taskSchema = z.object({
     sign: z.string(),
     amount: z.string()
 });
+
+export const createSubmissionInput = z.object({
+    taskId: z.string(),
+    selection: z.string()
+});

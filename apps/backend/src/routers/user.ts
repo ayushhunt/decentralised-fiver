@@ -6,6 +6,7 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post'
 import { taskSchema } from "../types";
+import { TOTAL_DECIMALS } from "../config";
 
 
 const prismaClient = new PrismaClient();
@@ -135,7 +136,7 @@ router.post("/task", authMiddleware, async (req: Request, res: Response) => {
         const response = await tx.task.create({
             data: {
                 title: parsed.data.title ?? "Select most clickable image",
-                amount: parsed.data.amount,
+                amount: 0.1*TOTAL_DECIMALS,
                 sign: parsed.data.sign,
                 user_id: id
             }
