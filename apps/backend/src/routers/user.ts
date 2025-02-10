@@ -63,9 +63,9 @@ router.get("/getPresingedUrl", authMiddleware, async (req: Request, res: Respons
         ],
         Expires: 3600
     })
-      console.log ({url,fields});
+      //console.log ({url,fields});
 
-      res.json({preSigned:url});
+      res.json({preSigned:url,fields});
 });
 
 
@@ -124,9 +124,9 @@ router.get("/task", authMiddleware, async (req: Request, res: Response) => {
 router.post("/task", authMiddleware, async (req: Request, res: Response) => {
     //@ts-ignore
     const id = req.userId;
-
+    //console.log(req.body);
     const parsed = taskSchema.safeParse(req.body);
-
+    console.log(id)
     if(!parsed.success){
         res.status(411).json({message:"Incorrect data format"});
         return;

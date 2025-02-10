@@ -6,7 +6,6 @@ export const taskSchema = z.object({
     })),
     title: z.string().optional(),
     sign: z.string(),
-    amount: z.string()
 });
 
 export const createSubmissionInput = z.object({

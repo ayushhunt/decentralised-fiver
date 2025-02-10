@@ -109,18 +109,18 @@ router.post("/submission",workerMiddleware, async (req,res) => {
     const parsedData = createSubmissionInput.safeParse(body);
 
     if(parsedData.success){
-        const task = await getNextTask(id);
+        const task = await getNextTask(Number(id));
         if(!task || task?.id !== Number(parsedData.data.taskId)){
-            res.status(400).json({error:"Task not found"});
+            res.status(411).json({message:"Incorrect task id"});
             return;
         }
 
         const amount = (Number(task.amount)/TOTAL_SUBMISSIONS).toString();
-        const submission = prismaClient.$transaction(async tx => {
+        const submission = await prismaClient.$transaction(async tx => {
             const submission = await tx.submission.create({
                 data: {
                     option_id: Number(parsedData.data.selection),
-                    task_id: task.id,
+                    task_id: Number(parsedData.data.taskId),
                     worker_id: id,
                     amount:Number(amount)
                 }
@@ -139,7 +139,7 @@ router.post("/submission",workerMiddleware, async (req,res) => {
 
             return submission;;
         })
-        const nextTask = await getNextTask(id);
+        const nextTask = await getNextTask(Number(id));
         res.json({amount,nextTask});
     }else {
         res.status(411).json({
