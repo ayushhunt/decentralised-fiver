@@ -7,6 +7,8 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post'
 import { taskSchema } from "../types";
 import { TOTAL_DECIMALS } from "../config";
+import nacl from "tweetnacl";
+import { PublicKey } from "@solana/web3.js";
 
 
 const prismaClient = new PrismaClient();
@@ -28,11 +30,25 @@ const router = Router();
 
 router.post("/signin", async (req, res) => {
     
-    const harcodedWallet = "0x1234567890";
+    const { publicKey, signature } = req.body;
+    const message = new TextEncoder().encode("Sign into mechanical turks");
+
+    const result = nacl.sign.detached.verify(
+        message,
+        new Uint8Array(signature.data),
+        new PublicKey(publicKey).toBytes(),
+    );
+
+
+    if (!result) {
+        return res.status(411).json({
+            message: "Incorrect signature"
+        })
+    }
 
     const existingUser = await prismaClient.user.findFirst({
         where: {
-            address: harcodedWallet
+            address: publicKey
         }
     });
 
@@ -42,7 +58,7 @@ router.post("/signin", async (req, res) => {
     } else {
         const newUser = await prismaClient.user.create({
             data: {
-                address: harcodedWallet
+                address: publicKey
             }
         });
 
